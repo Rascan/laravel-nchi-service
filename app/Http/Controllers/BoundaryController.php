@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateBoundaryRequest;
+use App\Http\Requests\ListBoundariesRequest;
 use App\Http\Resources\BoundaryResource;
 use App\Models\Boundary;
 use Illuminate\Http\Request;
@@ -15,20 +16,25 @@ class BoundaryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $level = request()->query('level');
-        $countryUid = request()->query('country_uid');
+    public function index(ListBoundariesRequest $request)
+    {   
+        $queries = $request->validated();
 
         $boundaries = Boundary::orderBy('level')
-            ->when($level, function ($query) use($level) {
-                $query->where('level', (int) $level);
-            })
-            ->when($countryUid, function ($query) use($countryUid) {
-                $query->whereHas('country', function ($query) use($countryUid) {
-                    $query->where('country_uid', $countryUid);
-                });
-            })
+            ->when(
+                isset($queries['levels']), 
+                function ($query) use($queries) {
+                    $query->whereIn('level', $queries['levels']);
+                }
+            )
+            ->when(
+                isset($queries['country_uid']), 
+                function ($query) use($queries) {
+                    $query->whereHas('country', function ($query) use($queries) {
+                        $query->where('country_uid', $queries['country_uid']);
+                    });
+                }
+            )
             ->simplePaginate(15);
 
         return BoundaryResource::collection($boundaries);
@@ -63,17 +69,5 @@ class BoundaryController extends Controller
         return response()->json([
             'data' => new BoundaryResource($boundary),
         ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Boundary  $boundary
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Boundary $boundary)
-    {
-        //
     }
 }

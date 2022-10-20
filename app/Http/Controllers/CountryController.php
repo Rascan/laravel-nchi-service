@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCountryRequest;
+use App\Http\Requests\CreateCountryRequest;
 use App\Http\Requests\UpdateCountryRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
@@ -35,7 +35,7 @@ class CountryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCountryRequest $request)
+    public function store(CreateCountryRequest $request)
     {
         [ 'name' => $name] = $request->validated();
 

@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
 
-class StoreCountryRequest extends FormRequest
+class ListBoundariesRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +24,14 @@ class StoreCountryRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->merge([
-            'slug' => Str::slug($this->name),
-        ]);
+        $merges = [];
+
+        $levels = array_filter(explode('|', $this->levels));
+        if (count($levels) > 0) {
+            $merges['levels'] = array_unique($levels);
+        }
+        
+        $this->merge($merges);
     }
 
     /**
@@ -38,13 +42,21 @@ class StoreCountryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => [
-                'required',
+            'levels' => [
+                'sometimes',
+                'array',
+                'min:1',
+                'max:3',
             ],
-            
-            'slug' => [
-                Rule::unique('countries', 'slug'),
-            ]
+
+            'levels.*' => [
+                'numeric',
+            ],
+
+            'country_uid' => [
+                'sometimes',
+                Rule::exists('countries'),
+            ],
         ];
     }
 }

@@ -18,8 +18,7 @@ class BoundaryResource extends JsonResource
             'boundary_uid' => $this->boundary_uid,
             'name' => $this->name,
             'level' => $this->level,
-            'cool_looking_level' => $this->level,
-            'country_uid' => $this->country_uid,
+            'country' => new CountryResource($this->country),
         ];
     }
 }
