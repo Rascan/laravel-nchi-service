@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCountryRequest;
+use App\Http\Requests\UpdateCountryRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CountryController extends Controller
 {
@@ -17,23 +20,13 @@ class CountryController extends Controller
     {
         $search = request()->query('search');
 
-        $countries = Country::orderBy('display_name', 'asc')
+        $countries = Country::orderBy('name', 'asc')
             ->when($search, function ($query) use($search) {
-                $query->where('display_name', 'like', "%$search%");
+                $query->where('name', 'like', "%$search%");
             })
             ->simplePaginate(15);
 
         return CountryResource::collection($countries);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -42,9 +35,20 @@ class CountryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreCountryRequest $request)
     {
-        //
+        [ 'name' => $name] = $request->validated();
+
+        $country = Country::create([
+            'country_uid' => Str::uuid(),
+            'name' => $name,
+            'slug' => Str::slug($name),
+        ]);
+
+        return response()->json([
+            'data' => new CountryResource($country),
+            'message' => 'Country details persisted successfully',
+        ]);
     }
 
     /**
@@ -55,18 +59,9 @@ class CountryController extends Controller
      */
     public function show(Country $country)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Country  $country
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Country $country)
-    {
-        //
+        return response()->json([
+            'data' => new CountryResource($country),
+        ]);
     }
 
     /**
@@ -76,19 +71,13 @@ class CountryController extends Controller
      * @param  \App\Models\Country  $country
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Country $country)
+    public function update(UpdateCountryRequest $request, Country $country)
     {
-        //
-    }
+        $country->update($request->validated());
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Country  $country
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Country $country)
-    {
-        //
+        return response()->json([
+            'data' => new CountryResource($country),
+            'message' => 'Country details persisted successfully',
+        ]);
     }
 }
