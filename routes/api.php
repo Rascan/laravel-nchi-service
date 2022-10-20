@@ -5,4 +5,12 @@ Route::group(['prefix' => '/v1/'], function () {
     Route::apiResource('countries', 'CountryController')->only([
         'index', 'store', 'show', 'update',
     ]);
+
+    Route::apiResource('boundaries', 'BoundaryController')->only([
+        'index', 'store', 'show',
+    ]);
+
+    Route::apiResource('jurisdictions', 'JurisdictionController')->only([
+        'index', 'store', 'show',
+    ]);
 });

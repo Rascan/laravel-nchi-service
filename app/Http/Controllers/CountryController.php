@@ -48,7 +48,7 @@ class CountryController extends Controller
         return response()->json([
             'data' => new CountryResource($country),
             'message' => 'Country details persisted successfully',
-        ]);
+        ], 201);
     }
 
     /**
