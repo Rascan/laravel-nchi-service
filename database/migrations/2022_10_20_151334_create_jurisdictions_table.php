@@ -18,10 +18,15 @@ class CreateJurisdictionsTable extends Migration
             $table->string('jurisdiction_uid')->index()->unique();
             $table->string('name')->index();
             $table->string('boundary_uid');
+            $table->string('parent_uid')->nullable();
             $table->timestamps();
 
             $table->unique(['name', 'boundary_uid']);
             $table->foreign('boundary_uid')->references('boundary_uid')->on('boundaries')->onDelete('cascade');
+        });
+        
+        Schema::table('jurisdictions', function (Blueprint $table) {
+            $table->foreign('parent_uid')->references('jurisdiction_uid')->on('jurisdictions')->onDelete('cascade');
         });
     }
 

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateJurisdictionRequest;
+use App\Http\Resources\JurisdictionResource;
 use App\Models\Jurisdiction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class JurisdictionController extends Controller
 {
@@ -14,17 +17,11 @@ class JurisdictionController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $jurisdictions = Jurisdiction::orderBy('name')
+            ->with(['parent', 'boundary'])
+            ->simplePaginate(15);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return JurisdictionResource::collection($jurisdictions);
     }
 
     /**
@@ -33,9 +30,18 @@ class JurisdictionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateJurisdictionRequest $request)
     {
-        //
+        $jurisdiction = Jurisdiction::create(array_merge([
+            'jurisdiction_uid' => Str::uuid(),
+        ], $request->validated()));
+
+        $jurisdiction->load('parent');
+
+        return response()->json([
+            'data' => new JurisdictionResource($jurisdiction),
+            'message' => 'Jurisdiction details persisted successfully',
+        ], 201);
     }
 
     /**
@@ -46,40 +52,10 @@ class JurisdictionController extends Controller
      */
     public function show(Jurisdiction $jurisdiction)
     {
-        //
-    }
+        $jurisdiction->load(['parent', 'boundary']);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Jurisdiction  $jurisdiction
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Jurisdiction $jurisdiction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Jurisdiction  $jurisdiction
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Jurisdiction $jurisdiction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Jurisdiction  $jurisdiction
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Jurisdiction $jurisdiction)
-    {
-        //
+        return response()->json([
+            'data' => new JurisdictionResource($jurisdiction),
+        ]);
     }
 }

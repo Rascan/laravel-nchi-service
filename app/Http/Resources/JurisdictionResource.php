@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BoundaryResource extends JsonResource
+class JurisdictionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,10 @@ class BoundaryResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'boundary_uid' => $this->boundary_uid,
+            'jurisdiction_uid' => $this->jurisdiction_uid,
             'name' => $this->name,
-            'level' => $this->level,
-            'country' => new CountryResource($this->whenLoaded('country')),
+            'boundary' => new BoundaryResource($this->whenLoaded('boundary')),
+            'parent' => new JurisdictionResource($this->whenLoaded('parent')),
         ];
     }
 }

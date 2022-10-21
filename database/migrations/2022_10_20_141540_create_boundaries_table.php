@@ -18,7 +18,7 @@ class CreateBoundariesTable extends Migration
             $table->string('boundary_uid')->index()->unique();
             $table->string('name')->index();
             $table->integer('level')->unsigned();
-            $table->string('country_uid')->index()->unique();
+            $table->string('country_uid')->index();
             $table->timestamps();
 
             $table->unique(['country_uid', 'name']);

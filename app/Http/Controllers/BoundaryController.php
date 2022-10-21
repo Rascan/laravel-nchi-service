@@ -21,6 +21,7 @@ class BoundaryController extends Controller
         $queries = $request->validated();
 
         $boundaries = Boundary::orderBy('level')
+            ->with(['country'])
             ->when(
                 isset($queries['levels']), 
                 function ($query) use($queries) {
@@ -51,6 +52,8 @@ class BoundaryController extends Controller
         $boundary = Boundary::create(array_merge([
             'boundary_uid' => Str::uuid(),
         ], $request->validated()));
+
+        $boundary->load('country');
 
         return response()->json([
             'data' => new BoundaryResource($boundary),
