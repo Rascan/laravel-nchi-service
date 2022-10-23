@@ -17,8 +17,15 @@ class JurisdictionController extends Controller
      */
     public function index()
     {
+        $countryUid = request()->query('country_uid');
+
         $jurisdictions = Jurisdiction::orderBy('name')
             ->with(['parent', 'boundary'])
+            ->when($countryUid, function ($query) use($countryUid) {
+                $query->whereHas('boundary.country', function ($query) use($countryUid) {
+                    $query->where('countries.country_uid', $countryUid);
+                });
+            })
             ->simplePaginate(15);
 
         return JurisdictionResource::collection($jurisdictions);
