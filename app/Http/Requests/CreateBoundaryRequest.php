@@ -34,6 +34,16 @@ class CreateBoundaryRequest extends FormRequest
                 'required',
                 Rule::unique('boundaries')->where('country_uid', $this->country_uid),
             ],
+
+            'level' => [
+                'required',
+                'integer',
+                Rule::unique('boundaries')->where(function ($query) {
+                    $query->where('country_uid', $this->country_uid);
+                }),
+            ],
+
+
             
             'level' => [
                 'required',
